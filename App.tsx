@@ -140,7 +140,7 @@ export default function App() {
             contentStyle: { backgroundColor: colors.background },
           }}
         >
-          <Stack.Screen name="PatientList" component={PatientListScreen} options={{ title: 'Patients', headerLargeTitle: true, headerLargeTitleShadowVisible: false }} />
+          <Stack.Screen name="PatientList" component={PatientListScreen} options={{ title: 'Patients', headerShown: false }} />
           <Stack.Screen
             name="PatientForm"
             component={PatientFormScreen}

@@ -37,3 +37,19 @@ export function initials(name: string) {
   const letters = parts.length > 1 ? parts[0][0] + parts[parts.length - 1][0] : (parts[0] ?? '?').slice(0, 2);
   return letters.toUpperCase();
 }
+
+// Friendly pastel pairs for avatars; each patient keeps the same color.
+const avatarPalette = [
+  { bg: '#E3F1EC', fg: '#2F6B5F' }, // mint
+  { bg: '#FDE9DC', fg: '#B5562A' }, // peach
+  { bg: '#ECE6FA', fg: '#6146B0' }, // lavender
+  { bg: '#E0EEFB', fg: '#2D6AA8' }, // sky
+  { bg: '#FBF1D3', fg: '#9A6B00' }, // butter
+  { bg: '#FBE4EA', fg: '#B23A5E' }, // rose
+];
+
+export function avatarColors(seed: string) {
+  let h = 0;
+  for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) | 0;
+  return avatarPalette[Math.abs(h) % avatarPalette.length];
+}

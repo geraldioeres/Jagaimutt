@@ -56,7 +56,7 @@ export default function PatientFormScreen({ navigation, route }: Props) {
           onSubmitEditing={save}
         />
         {error && <ErrorBanner message={error} />}
-        <Button title={existing ? 'Save changes' : 'Add patient'} onPress={save} loading={busy} disabled={!valid} style={{ marginTop: space.sm }} />
+        <Button title={existing ? 'save changes' : 'add patient'} onPress={save} loading={busy} disabled={!valid} style={{ marginTop: space.sm }} />
       </View>
     </KeyboardAvoidingView>
   );

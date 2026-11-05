@@ -1,4 +1,5 @@
 import 'react-native-url-polyfill/auto';
+import { Platform } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 import { createClient } from '@supabase/supabase-js';
 
@@ -39,9 +40,16 @@ if (!url || !anonKey) {
   throw new Error('Missing EXPO_PUBLIC_SUPABASE_URL or EXPO_PUBLIC_SUPABASE_ANON_KEY. Copy .env.example to .env.');
 }
 
+// SecureStore has no web implementation, so the browser build uses localStorage.
+const webStorage = {
+  getItem: async (key: string) => localStorage.getItem(key),
+  setItem: async (key: string, value: string) => localStorage.setItem(key, value),
+  removeItem: async (key: string) => localStorage.removeItem(key),
+};
+
 export const supabase = createClient(url, anonKey, {
   auth: {
-    storage: secureStorage,
+    storage: Platform.OS === 'web' ? webStorage : secureStorage,
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: false,

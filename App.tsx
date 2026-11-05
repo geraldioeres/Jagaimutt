@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, AppState, Pressable, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, AppState, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import * as LocalAuthentication from 'expo-local-authentication';
 import { NavigationContainer } from '@react-navigation/native';
@@ -46,6 +46,11 @@ export default function App() {
     prompting.current = true;
     setLockError(null);
     try {
+      // Biometrics don't exist in a browser; the account login is the only gate there.
+      if (Platform.OS === 'web') {
+        setLocked(false);
+        return;
+      }
       const enrolled = await LocalAuthentication.isEnrolledAsync();
       if (!enrolled) {
         setLockError('Set up a screen lock or biometrics on this phone to use the app.');

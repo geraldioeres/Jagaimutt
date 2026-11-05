@@ -5,7 +5,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { supabase } from '../lib/supabase';
 import type { Note } from '../lib/types';
 import type { RootStackParamList } from '../../App';
-import { Avatar, Button, ErrorBanner, TextAction } from '../ui/components';
+import { Avatar, Button, ErrorBanner, Pill, TextAction } from '../ui/components';
 import { colors, radius, shadow, space, type } from '../ui/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'PatientDetail'>;
@@ -60,7 +60,11 @@ export default function PatientDetailScreen({ navigation, route }: Props) {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerRight: () => <TextAction title="Edit" onPress={() => navigation.navigate('PatientForm', { patient })} />,
+      headerRight: () => (
+        <View style={styles.headerAction}>
+          <Pill title="Edit" icon="✎" accessibilityLabel="Edit patient" onPress={() => navigation.navigate('PatientForm', { patient })} />
+        </View>
+      ),
     });
   }, [navigation, patient]);
 
@@ -99,7 +103,7 @@ export default function PatientDetailScreen({ navigation, route }: Props) {
   const header = (
     <View style={{ gap: space.lg }}>
       <View style={styles.profile}>
-        <Avatar name={patient.name} size={64} />
+        <Avatar name={patient.name} seed={patient.id} size={72} />
         <Text style={[type.title, { marginTop: space.md, textAlign: 'center' }]}>{patient.name}</Text>
         <View style={styles.chip}>
           <Text style={styles.chipText}>#{patient.patient_number}</Text>
@@ -183,6 +187,8 @@ export default function PatientDetailScreen({ navigation, route }: Props) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
+  // Web's header has no edge inset of its own.
+  headerAction: { marginRight: Platform.OS === 'web' ? space.lg : 0 },
   content: { padding: space.lg, paddingBottom: space.xxl, width: '100%', maxWidth: 640, alignSelf: 'center' },
   profile: { alignItems: 'center', paddingTop: space.sm, paddingBottom: space.sm },
   chip: { marginTop: space.sm, backgroundColor: '#ECECE8', borderRadius: radius.pill, paddingHorizontal: space.md, paddingVertical: 4 },

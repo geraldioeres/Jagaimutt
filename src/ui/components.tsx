@@ -11,7 +11,7 @@ import {
   type TextInputProps,
   type ViewStyle,
 } from 'react-native';
-import { colors, initials, radius, space, type } from './theme';
+import { avatarColors, colors, initials, radius, space, type } from './theme';
 
 type ButtonProps = Omit<PressableProps, 'style'> & {
   title: string;
@@ -30,7 +30,7 @@ export function Button({ title, variant = 'primary', loading, disabled, style, .
       style={({ pressed }) => [
         styles.button,
         { backgroundColor: v.bg },
-        pressed && { opacity: 0.85, transform: [{ scale: 0.99 }] },
+        pressed && { opacity: 0.9, transform: [{ scale: 0.97 }] },
         inactive && { opacity: 0.45 },
         style,
       ]}
@@ -69,13 +69,49 @@ export const Field = forwardRef<FieldRef, FieldProps>(function Field({ label, st
   );
 });
 
-export function Avatar({ name, size = 40 }: { name: string; size?: number }) {
+export function Avatar({ name, seed, size = 40 }: { name: string; seed?: string; size?: number }) {
+  const c = avatarColors(seed ?? name);
   return (
-    <View style={[styles.avatar, { width: size, height: size, borderRadius: size / 2 }]}>
-      <Text style={[styles.avatarText, { fontSize: size * 0.38 }]}>{initials(name)}</Text>
+    <View style={[styles.avatar, { width: size, height: size, borderRadius: size * 0.36, backgroundColor: c.bg }]}>
+      <Text style={[styles.avatarText, { fontSize: size * 0.38, color: c.fg }]}>{initials(name)}</Text>
     </View>
   );
 }
+
+type PillProps = {
+  title: string;
+  onPress: () => void;
+  icon?: string;
+  tone?: 'accent' | 'soft' | 'danger';
+  accessibilityLabel?: string;
+};
+
+// Rounded, bouncy button for headers and quick actions.
+export function Pill({ title, onPress, icon, tone = 'soft', accessibilityLabel }: PillProps) {
+  const t = pillTones[tone];
+  return (
+    <Pressable
+      onPress={onPress}
+      hitSlop={6}
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel ?? title}
+      style={({ pressed }) => [
+        styles.pill,
+        { backgroundColor: t.bg },
+        pressed && { transform: [{ scale: 0.93 }], opacity: 0.9 },
+      ]}
+    >
+      {icon && <Text style={[styles.pillIcon, { color: t.fg }]}>{icon}</Text>}
+      <Text style={[styles.pillText, { color: t.fg }]}>{title}</Text>
+    </Pressable>
+  );
+}
+
+const pillTones = {
+  accent: { bg: colors.accent, fg: '#fff' },
+  soft: { bg: '#ECECE8', fg: colors.ink },
+  danger: { bg: colors.dangerSoft, fg: colors.danger },
+};
 
 export function TextAction({ title, onPress, tone = 'accent' }: { title: string; onPress: () => void; tone?: 'accent' | 'muted' | 'danger' }) {
   const color = tone === 'danger' ? colors.danger : tone === 'muted' ? colors.muted : colors.accent;
@@ -96,13 +132,13 @@ export function ErrorBanner({ message }: { message: string }) {
 
 const styles = StyleSheet.create({
   button: {
-    height: 50,
-    borderRadius: radius.md,
+    height: 52,
+    borderRadius: radius.pill,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: space.xl,
   },
-  buttonText: { fontSize: 16, fontWeight: '600', letterSpacing: 0.1 },
+  buttonText: { fontSize: 16, fontWeight: '700', letterSpacing: 0.1 },
   input: {
     backgroundColor: colors.surface,
     borderWidth: 1,
@@ -114,8 +150,11 @@ const styles = StyleSheet.create({
     color: colors.ink,
   },
   inputFocused: { borderColor: colors.accent },
-  avatar: { backgroundColor: colors.accentSoft, alignItems: 'center', justifyContent: 'center' },
-  avatarText: { color: colors.accent, fontWeight: '700', letterSpacing: 0.3 },
+  avatar: { alignItems: 'center', justifyContent: 'center' },
+  pill: { flexDirection: 'row', alignItems: 'center', gap: 6, height: 36, paddingHorizontal: 14, borderRadius: radius.pill },
+  pillIcon: { fontSize: 18, fontWeight: '700', marginTop: -1 },
+  pillText: { fontSize: 14, fontWeight: '700', letterSpacing: 0.1 },
+  avatarText: { fontWeight: '800', letterSpacing: 0.3 },
   textAction: { fontSize: 15, fontWeight: '500' },
   banner: { backgroundColor: colors.dangerSoft, borderRadius: radius.sm, paddingVertical: 10, paddingHorizontal: space.md },
   bannerText: { color: colors.danger, fontSize: 14, lineHeight: 20 },

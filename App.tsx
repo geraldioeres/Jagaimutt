@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, AppState, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, AppState, Platform, StyleSheet, Text, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import * as LocalAuthentication from 'expo-local-authentication';
-import { NavigationContainer } from '@react-navigation/native';
+import { DefaultTheme, NavigationContainer, type Theme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import type { Session } from '@supabase/supabase-js';
@@ -12,6 +12,8 @@ import PatientListScreen from './src/screens/PatientListScreen';
 import PatientFormScreen from './src/screens/PatientFormScreen';
 import PatientDetailScreen from './src/screens/PatientDetailScreen';
 import type { Patient } from './src/lib/types';
+import { Button } from './src/ui/components';
+import { colors, space, type } from './src/ui/theme';
 
 export type RootStackParamList = {
   PatientList: undefined;
@@ -20,6 +22,18 @@ export type RootStackParamList = {
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
+
+const navTheme: Theme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    primary: colors.accent,
+    background: colors.background,
+    card: colors.background,
+    text: colors.ink,
+    border: colors.border,
+  },
+};
 
 // Re-lock when the app has been in the background longer than this.
 const LOCK_AFTER_MS = 30_000;
@@ -92,7 +106,7 @@ export default function App() {
   if (!ready) {
     content = (
       <View style={styles.center}>
-        <ActivityIndicator />
+        <ActivityIndicator color={colors.accent} />
       </View>
     );
   } else if (!session) {
@@ -100,24 +114,39 @@ export default function App() {
   } else if (locked) {
     content = (
       <View style={styles.center}>
-        <Text style={styles.title}>Patient Notes</Text>
-        <Text style={styles.sub}>Locked</Text>
+        <View style={styles.lock}>
+          <View style={styles.lockShackle} />
+          <View style={styles.lockBody} />
+        </View>
+        <Text style={[type.title, { marginTop: space.xl }]}>Patient Notes</Text>
+        <Text style={[type.caption, { marginTop: space.xs, fontSize: 15 }]}>Unlock to view your patients</Text>
         {lockError && <Text style={styles.error}>{lockError}</Text>}
-        <Pressable style={styles.button} onPress={unlock}>
-          <Text style={styles.buttonText}>Unlock</Text>
-        </Pressable>
-        <Pressable onPress={() => supabase.auth.signOut()}>
-          <Text style={styles.link}>Sign out</Text>
-        </Pressable>
+        <View style={styles.lockActions}>
+          <Button title="Unlock" onPress={unlock} />
+          <Button title="Sign out" variant="ghost" onPress={() => supabase.auth.signOut()} />
+        </View>
       </View>
     );
   } else {
     content = (
-      <NavigationContainer>
-        <Stack.Navigator>
-          <Stack.Screen name="PatientList" component={PatientListScreen} options={{ title: 'Patients' }} />
-          <Stack.Screen name="PatientForm" component={PatientFormScreen} options={{ title: 'Patient' }} />
-          <Stack.Screen name="PatientDetail" component={PatientDetailScreen} options={{ title: 'Notes' }} />
+      <NavigationContainer theme={navTheme}>
+        <Stack.Navigator
+          screenOptions={{
+            headerShadowVisible: false,
+            headerStyle: { backgroundColor: colors.background },
+            headerTitleStyle: { fontWeight: '600', color: colors.ink },
+            headerTintColor: colors.accent,
+            headerBackButtonDisplayMode: 'minimal',
+            contentStyle: { backgroundColor: colors.background },
+          }}
+        >
+          <Stack.Screen name="PatientList" component={PatientListScreen} options={{ title: 'Patients', headerLargeTitle: true, headerLargeTitleShadowVisible: false }} />
+          <Stack.Screen
+            name="PatientForm"
+            component={PatientFormScreen}
+            options={({ route }) => ({ title: route.params?.patient ? 'Edit patient' : 'New patient', presentation: 'modal' })}
+          />
+          <Stack.Screen name="PatientDetail" component={PatientDetailScreen} options={{ title: '' }} />
         </Stack.Navigator>
       </NavigationContainer>
     );
@@ -125,18 +154,17 @@ export default function App() {
 
   return (
     <SafeAreaProvider>
-      <StatusBar style="auto" />
+      <StatusBar style="dark" />
       {content}
     </SafeAreaProvider>
   );
 }
 
 const styles = StyleSheet.create({
-  center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24, gap: 12 },
-  title: { fontSize: 24, fontWeight: '700' },
-  sub: { fontSize: 16, color: '#555' },
-  error: { color: '#b00020', textAlign: 'center' },
-  button: { backgroundColor: '#0a6cff', paddingVertical: 12, paddingHorizontal: 32, borderRadius: 8 },
-  buttonText: { color: '#fff', fontWeight: '600', fontSize: 16 },
-  link: { color: '#0a6cff', marginTop: 8 },
+  center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: space.xl, backgroundColor: colors.background },
+  lock: { width: 72, height: 72, borderRadius: 36, backgroundColor: colors.accentSoft, alignItems: 'center', justifyContent: 'center', paddingTop: 6 },
+  lockShackle: { width: 18, height: 14, borderWidth: 3, borderBottomWidth: 0, borderColor: colors.accent, borderTopLeftRadius: 9, borderTopRightRadius: 9 },
+  lockBody: { width: 28, height: 20, borderRadius: 5, backgroundColor: colors.accent },
+  error: { color: colors.danger, textAlign: 'center', marginTop: space.lg, lineHeight: 20 },
+  lockActions: { alignSelf: 'stretch', maxWidth: 360, width: '100%', marginTop: space.xxl, gap: space.sm, alignItems: 'stretch' },
 });

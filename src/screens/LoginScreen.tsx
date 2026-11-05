@@ -1,6 +1,8 @@
-import { useState } from 'react';
-import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, TextInput } from 'react-native';
+import { useRef, useState } from 'react';
+import { KeyboardAvoidingView, Platform, StyleSheet, Text, View } from 'react-native';
 import { supabase } from '../lib/supabase';
+import { Button, ErrorBanner, Field, type FieldRef } from '../ui/components';
+import { colors, radius, space, type } from '../ui/theme';
 
 // Sign-up is intentionally absent: create her account in the Supabase dashboard.
 export default function LoginScreen() {
@@ -8,8 +10,10 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const passwordRef = useRef<FieldRef>(null);
 
   const submit = async () => {
+    if (!email || !password) return;
     setBusy(true);
     setError(null);
     const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
@@ -19,39 +23,50 @@ export default function LoginScreen() {
 
   return (
     <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <Text style={styles.title}>Patient Notes</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        autoCapitalize="none"
-        keyboardType="email-address"
-        autoComplete="email"
-        value={email}
-        onChangeText={setEmail}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        secureTextEntry
-        autoComplete="password"
-        value={password}
-        onChangeText={setPassword}
-        onSubmitEditing={submit}
-      />
-      {error && <Text style={styles.error}>{error}</Text>}
-      <Pressable style={[styles.button, busy && { opacity: 0.6 }]} onPress={submit} disabled={busy || !email || !password}>
-        {busy ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Sign in</Text>}
-      </Pressable>
+      <View style={styles.inner}>
+        <View style={styles.mark}>
+          <View style={styles.markLine} />
+          <View style={[styles.markLine, { width: 14 }]} />
+        </View>
+        <Text style={[type.display, { marginTop: space.xl }]}>Patient Notes</Text>
+        <Text style={[type.caption, styles.subtitle]}>Sign in to continue</Text>
+
+        <View style={styles.form}>
+          <Field
+            label="Email"
+            placeholder="you@clinic.com"
+            autoCapitalize="none"
+            keyboardType="email-address"
+            autoComplete="email"
+            returnKeyType="next"
+            value={email}
+            onChangeText={setEmail}
+            onSubmitEditing={() => passwordRef.current?.focus()}
+          />
+          <Field
+            ref={passwordRef}
+            label="Password"
+            placeholder="••••••••"
+            secureTextEntry
+            autoComplete="password"
+            returnKeyType="go"
+            value={password}
+            onChangeText={setPassword}
+            onSubmitEditing={submit}
+          />
+          {error && <ErrorBanner message={error} />}
+          <Button title="Sign in" onPress={submit} loading={busy} disabled={!email || !password} style={{ marginTop: space.sm }} />
+        </View>
+      </View>
     </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', padding: 24, gap: 12 },
-  title: { fontSize: 28, fontWeight: '700', textAlign: 'center', marginBottom: 12 },
-  input: { borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 12, fontSize: 16 },
-  error: { color: '#b00020' },
-  button: { backgroundColor: '#0a6cff', padding: 14, borderRadius: 8, alignItems: 'center' },
-  buttonText: { color: '#fff', fontWeight: '600', fontSize: 16 },
+  container: { flex: 1, backgroundColor: colors.background },
+  inner: { flex: 1, justifyContent: 'center', padding: space.xl, width: '100%', maxWidth: 420, alignSelf: 'center' },
+  mark: { width: 52, height: 52, borderRadius: radius.md, backgroundColor: colors.accent, justifyContent: 'center', paddingLeft: 14, gap: 5 },
+  markLine: { width: 22, height: 3, borderRadius: 2, backgroundColor: '#fff' },
+  subtitle: { marginTop: space.xs, fontSize: 16 },
+  form: { marginTop: space.xxl, gap: space.lg },
 });
-

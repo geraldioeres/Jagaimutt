@@ -1,12 +1,12 @@
-import { useCallback, useLayoutEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { ActivityIndicator, Alert, FlatList, KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useFocusEffect } from '@react-navigation/native';
 import { supabase } from '../lib/supabase';
 import type { Note } from '../lib/types';
 import type { RootStackParamList } from '../../App';
-import { Avatar, Button, ErrorBanner, Pill, TextAction } from '../ui/components';
-import { colors, radius, shadow, space, type } from '../ui/theme';
+import { Avatar, Button, ErrorBanner, RoundButton, TextAction } from '../ui/components';
+import { colors, fonts, radius, shadow, space, type } from '../ui/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'PatientDetail'>;
 
@@ -58,16 +58,6 @@ export default function PatientDetailScreen({ navigation, route }: Props) {
     ]);
   }, [navigation, patient]);
 
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      headerRight: () => (
-        <View style={styles.headerAction}>
-          <Pill title="Edit" icon="✎" accessibilityLabel="Edit patient" onPress={() => navigation.navigate('PatientForm', { patient })} />
-        </View>
-      ),
-    });
-  }, [navigation, patient]);
-
   const saveNote = async () => {
     setBusy(true);
     setError(null);
@@ -103,15 +93,24 @@ export default function PatientDetailScreen({ navigation, route }: Props) {
   const header = (
     <View style={{ gap: space.lg }}>
       <View style={styles.profile}>
-        <Avatar name={patient.name} seed={patient.id} size={72} />
-        <Text style={[type.title, { marginTop: space.md, textAlign: 'center' }]}>{patient.name}</Text>
+        <Avatar name={patient.name} seed={patient.id} size={88} />
+        <Text style={[type.title, { marginTop: space.lg, textAlign: 'center' }]}>{patient.name}</Text>
         <View style={styles.chip}>
           <Text style={styles.chipText}>#{patient.patient_number}</Text>
         </View>
+        <RoundButton
+          glyph="✎"
+          size={52}
+          accessibilityLabel="Edit patient"
+          onPress={() => navigation.navigate('PatientForm', { patient })}
+          style={styles.profileAction}
+        />
       </View>
 
+      <Text style={styles.sectionTitle}>notes</Text>
+
       <View style={[styles.composer, focused && styles.composerFocused]}>
-        {editingId && <Text style={[type.label, { marginBottom: space.xs }]}>EDITING NOTE</Text>}
+        {editingId && <Text style={[type.label, { marginBottom: space.xs, color: colors.accent }]}>Editing note</Text>}
         <TextInput
           style={styles.input}
           placeholder="Write a note…"
@@ -126,7 +125,7 @@ export default function PatientDetailScreen({ navigation, route }: Props) {
         <View style={styles.composerButtons}>
           {editingId && <TextAction title="Cancel" tone="muted" onPress={() => { setEditingId(null); setDraft(''); }} />}
           <Button
-            title={editingId ? 'Update' : 'Add note'}
+            title={editingId ? 'update' : 'add note'}
             onPress={saveNote}
             loading={busy}
             disabled={!draft.trim()}
@@ -137,11 +136,6 @@ export default function PatientDetailScreen({ navigation, route }: Props) {
 
       {error && <ErrorBanner message={error} />}
 
-      {!loading && notes.length > 0 && (
-        <Text style={[type.label, { marginTop: space.sm, marginLeft: space.xs }]}>
-          {notes.length} {notes.length === 1 ? 'NOTE' : 'NOTES'}
-        </Text>
-      )}
     </View>
   );
 
@@ -159,7 +153,10 @@ export default function PatientDetailScreen({ navigation, route }: Props) {
           loading ? (
             <ActivityIndicator color={colors.accent} style={{ marginTop: space.xl }} />
           ) : (
-            <Text style={[type.caption, styles.empty]}>No notes yet.</Text>
+            <View style={styles.empty}>
+              <Text style={{ fontSize: 40 }}>📝</Text>
+              <Text style={type.caption}>No notes yet. Write the first one above.</Text>
+            </View>
           )
         }
         ListFooterComponent={
@@ -169,7 +166,7 @@ export default function PatientDetailScreen({ navigation, route }: Props) {
         }
         renderItem={({ item }) => (
           <View style={[styles.note, editingId === item.id && styles.noteEditing]}>
-            <Text style={type.caption}>
+            <Text style={styles.date}>
               {formatDate(item.created_at)}
               {item.updated_at !== item.created_at ? '  ·  edited' : ''}
             </Text>
@@ -187,20 +184,29 @@ export default function PatientDetailScreen({ navigation, route }: Props) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
-  // Web's header has no edge inset of its own.
-  headerAction: { marginRight: Platform.OS === 'web' ? space.lg : 0 },
-  content: { padding: space.lg, paddingBottom: space.xxl, width: '100%', maxWidth: 640, alignSelf: 'center' },
-  profile: { alignItems: 'center', paddingTop: space.sm, paddingBottom: space.sm },
-  chip: { marginTop: space.sm, backgroundColor: '#ECECE8', borderRadius: radius.pill, paddingHorizontal: space.md, paddingVertical: 4 },
-  chipText: { fontSize: 13, fontWeight: '600', color: colors.muted, letterSpacing: 0.3 },
-  composer: { backgroundColor: colors.surface, borderRadius: radius.lg, padding: space.lg, borderWidth: 1, borderColor: 'transparent', ...shadow },
+  content: { padding: space.xl, paddingTop: space.sm, paddingBottom: space.xxl, width: '100%', maxWidth: 640, alignSelf: 'center' },
+  profile: {
+    alignItems: 'center',
+    backgroundColor: colors.surface,
+    borderRadius: radius.xl,
+    paddingTop: space.xxl,
+    paddingBottom: 48,
+    marginBottom: 26,
+    ...shadow,
+  },
+  profileAction: { position: 'absolute', bottom: -26, alignSelf: 'center' },
+  chip: { marginTop: space.sm, backgroundColor: colors.accentSoft, borderRadius: radius.pill, paddingHorizontal: space.md, paddingVertical: 5 },
+  chipText: { fontSize: 13, fontFamily: fonts.bodyBlack, color: colors.accent, letterSpacing: 0.3 },
+  sectionTitle: { fontFamily: fonts.heading, fontSize: 28, color: colors.ink, opacity: 0.85, marginTop: space.sm },
+  composer: { backgroundColor: colors.surface, borderRadius: radius.lg, padding: space.lg, borderWidth: 1.5, borderColor: 'transparent', ...shadow },
   composerFocused: { borderColor: colors.accent },
-  input: { fontSize: 16, lineHeight: 23, color: colors.ink, minHeight: 72, textAlignVertical: 'top', padding: 0 },
+  input: { fontSize: 16, lineHeight: 23, fontFamily: fonts.body, color: colors.ink, minHeight: 72, textAlignVertical: 'top', padding: 0 },
   composerButtons: { flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', gap: space.lg, marginTop: space.md },
-  composerButton: { height: 40, borderRadius: radius.pill, paddingHorizontal: space.lg },
-  note: { backgroundColor: colors.surface, borderRadius: radius.lg, padding: space.lg, borderWidth: 1, borderColor: 'transparent', ...shadow },
+  composerButton: { height: 42, paddingHorizontal: space.xl },
+  note: { backgroundColor: colors.surface, borderRadius: radius.lg, padding: space.lg + 2, borderWidth: 1.5, borderColor: 'transparent', ...shadow },
   noteEditing: { borderColor: colors.accent },
+  date: { fontFamily: fonts.bodyBold, fontSize: 12, color: colors.faint, letterSpacing: 0.2 },
   noteActions: { flexDirection: 'row', gap: space.xl, marginTop: space.md },
-  empty: { textAlign: 'center', marginTop: space.xl },
-  footer: { alignItems: 'center', marginTop: space.xxl },
+  empty: { alignItems: 'center', gap: space.sm, marginTop: space.xl },
+  footer: { alignItems: 'center', marginTop: 40 },
 });

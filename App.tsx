@@ -12,8 +12,10 @@ import PatientListScreen from './src/screens/PatientListScreen';
 import PatientFormScreen from './src/screens/PatientFormScreen';
 import PatientDetailScreen from './src/screens/PatientDetailScreen';
 import type { Patient } from './src/lib/types';
-import { Button } from './src/ui/components';
-import { colors, space, type } from './src/ui/theme';
+import { useFonts, Fredoka_500Medium, Fredoka_600SemiBold, Fredoka_700Bold } from '@expo-google-fonts/fredoka';
+import { Nunito_500Medium, Nunito_700Bold, Nunito_800ExtraBold } from '@expo-google-fonts/nunito';
+import { Button, Wordmark } from './src/ui/components';
+import { colors, fonts, space, type } from './src/ui/theme';
 
 export type RootStackParamList = {
   PatientList: undefined;
@@ -45,6 +47,14 @@ export default function App() {
   const [lockError, setLockError] = useState<string | null>(null);
   const backgroundedAt = useRef<number | null>(null);
   const prompting = useRef(false);
+  const [fontsLoaded, fontError] = useFonts({
+    Fredoka_500Medium,
+    Fredoka_600SemiBold,
+    Fredoka_700Bold,
+    Nunito_500Medium,
+    Nunito_700Bold,
+    Nunito_800ExtraBold,
+  });
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -103,10 +113,11 @@ export default function App() {
   }, [session]);
 
   let content: React.ReactNode;
-  if (!ready) {
+  // A font that fails to load falls back to the system font rather than blocking the app.
+  if (!ready || (!fontsLoaded && !fontError)) {
     content = (
       <View style={styles.center}>
-        <ActivityIndicator color={colors.accent} />
+        <ActivityIndicator color="#fff" />
       </View>
     );
   } else if (!session) {
@@ -114,16 +125,17 @@ export default function App() {
   } else if (locked) {
     content = (
       <View style={styles.center}>
+        <Wordmark />
         <View style={styles.lock}>
           <View style={styles.lockShackle} />
           <View style={styles.lockBody} />
         </View>
-        <Text style={[type.title, { marginTop: space.xl }]}>Patient Notes</Text>
-        <Text style={[type.caption, { marginTop: space.xs, fontSize: 15 }]}>Unlock to view your patients</Text>
+        <Text style={[type.hero, { textAlign: 'center' }]}>Locked{'\n'}for privacy</Text>
+        <Text style={styles.lockSub}>Unlock to see your patients and notes.</Text>
         {lockError && <Text style={styles.error}>{lockError}</Text>}
         <View style={styles.lockActions}>
-          <Button title="Unlock" onPress={unlock} />
-          <Button title="Sign out" variant="ghost" onPress={() => supabase.auth.signOut()} />
+          <Button title="unlock" variant="white" chevron onPress={unlock} />
+          <Button title="sign out" variant="ghostLight" onPress={() => supabase.auth.signOut()} />
         </View>
       </View>
     );
@@ -134,7 +146,7 @@ export default function App() {
           screenOptions={{
             headerShadowVisible: false,
             headerStyle: { backgroundColor: colors.background },
-            headerTitleStyle: { fontWeight: '600', color: colors.ink },
+            headerTitleStyle: { fontFamily: fonts.heading, fontSize: 19, color: colors.ink },
             headerTintColor: colors.accent,
             headerBackButtonDisplayMode: 'minimal',
             contentStyle: { backgroundColor: colors.background },
@@ -154,17 +166,28 @@ export default function App() {
 
   return (
     <SafeAreaProvider>
-      <StatusBar style="dark" />
+      <StatusBar style={session && !locked ? 'dark' : 'light'} />
       {content}
     </SafeAreaProvider>
   );
 }
 
 const styles = StyleSheet.create({
-  center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: space.xl, backgroundColor: colors.background },
-  lock: { width: 72, height: 72, borderRadius: 36, backgroundColor: colors.accentSoft, alignItems: 'center', justifyContent: 'center', paddingTop: 6 },
-  lockShackle: { width: 18, height: 14, borderWidth: 3, borderBottomWidth: 0, borderColor: colors.accent, borderTopLeftRadius: 9, borderTopRightRadius: 9 },
-  lockBody: { width: 28, height: 20, borderRadius: 5, backgroundColor: colors.accent },
-  error: { color: colors.danger, textAlign: 'center', marginTop: space.lg, lineHeight: 20 },
-  lockActions: { alignSelf: 'stretch', maxWidth: 360, width: '100%', marginTop: space.xxl, gap: space.sm, alignItems: 'stretch' },
+  center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: space.xl, backgroundColor: colors.sky },
+  lock: {
+    width: 84,
+    height: 84,
+    borderRadius: 42,
+    backgroundColor: colors.surface,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingTop: 6,
+    marginTop: 48,
+    marginBottom: space.xl,
+  },
+  lockShackle: { width: 20, height: 16, borderWidth: 3.5, borderBottomWidth: 0, borderColor: colors.accent, borderTopLeftRadius: 10, borderTopRightRadius: 10 },
+  lockBody: { width: 32, height: 23, borderRadius: 7, backgroundColor: colors.accent },
+  lockSub: { fontFamily: fonts.bodyBold, color: '#fff', fontSize: 15, marginTop: space.md, textAlign: 'center' },
+  error: { color: '#fff', backgroundColor: 'rgba(224,112,127,0.85)', borderRadius: 12, overflow: 'hidden', padding: 10, textAlign: 'center', marginTop: space.lg, lineHeight: 20, fontFamily: fonts.bodyBold },
+  lockActions: { maxWidth: 320, width: '100%', marginTop: 48, gap: space.sm, alignItems: 'stretch', alignSelf: 'center' },
 });

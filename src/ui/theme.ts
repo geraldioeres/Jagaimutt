@@ -1,35 +1,49 @@
 import { Platform } from 'react-native';
 
 export const colors = {
-  background: '#F6F6F3',
+  sky: '#B7CFEE', // hero / full-screen blue
+  skyDeep: '#5C85C4', // headline text on sky
+  background: '#F4F7FC',
   surface: '#FFFFFF',
-  ink: '#1D1D1F',
-  muted: '#8A8A8E',
-  faint: '#B8B8BC',
-  border: '#E7E7E3',
-  accent: '#2F6B5F',
-  accentSoft: '#E6EFEC',
-  danger: '#C0453A',
-  dangerSoft: '#FBECEA',
+  ink: '#3F4A5C',
+  muted: '#8D98AA',
+  faint: '#C2CBD8',
+  border: '#E3EAF4',
+  accent: '#6F98D6',
+  accentSoft: '#E5EEFA',
+  danger: '#E0707F',
+  dangerSoft: '#FCEBEE',
 };
 
-export const radius = { sm: 10, md: 14, lg: 20, pill: 999 };
+// Loaded in App.tsx with useFonts. Custom fonts carry their own weight, so styles
+// pick a family instead of setting fontWeight.
+export const fonts = {
+  display: 'Fredoka_700Bold',
+  heading: 'Fredoka_600SemiBold',
+  headingSoft: 'Fredoka_500Medium',
+  body: 'Nunito_500Medium',
+  bodyBold: 'Nunito_700Bold',
+  bodyBlack: 'Nunito_800ExtraBold',
+};
+
+export const radius = { sm: 12, md: 18, lg: 28, xl: 36, pill: 999 };
 
 export const space = { xs: 4, sm: 8, md: 12, lg: 16, xl: 24, xxl: 32 };
 
 export const type = {
-  display: { fontSize: 30, fontWeight: '700' as const, letterSpacing: -0.6, color: colors.ink },
-  title: { fontSize: 22, fontWeight: '700' as const, letterSpacing: -0.3, color: colors.ink },
-  body: { fontSize: 16, lineHeight: 23, color: colors.ink },
-  label: { fontSize: 13, fontWeight: '600' as const, color: colors.muted, letterSpacing: 0.2 },
-  caption: { fontSize: 13, color: colors.muted },
+  hero: { fontFamily: fonts.display, fontSize: 34, lineHeight: 36, color: colors.skyDeep, textTransform: 'uppercase' as const },
+  display: { fontFamily: fonts.display, fontSize: 28, lineHeight: 32, color: colors.ink, textTransform: 'uppercase' as const },
+  title: { fontFamily: fonts.heading, fontSize: 24, lineHeight: 28, color: colors.ink },
+  body: { fontFamily: fonts.body, fontSize: 16, lineHeight: 23, color: colors.ink },
+  label: { fontFamily: fonts.bodyBold, fontSize: 13, color: colors.muted, letterSpacing: 0.2 },
+  caption: { fontFamily: fonts.body, fontSize: 13, color: colors.muted },
 };
 
-// Soft, low-contrast elevation for cards.
+// Soft, blue-tinted elevation for cards.
 export const shadow = Platform.select({
-  ios: { shadowColor: '#000', shadowOpacity: 0.04, shadowRadius: 12, shadowOffset: { width: 0, height: 2 } },
-  android: { elevation: 1 },
-  default: { boxShadow: '0 2px 12px rgba(0,0,0,0.04)' },
+  ios: { shadowColor: '#4A6FA5', shadowOpacity: 0.12, shadowRadius: 18, shadowOffset: { width: 0, height: 8 } },
+  android: { elevation: 3, shadowColor: '#4A6FA5' },
+  default: { boxShadow: '0 8px 24px rgba(74,111,165,0.14)' },
 }) as object;
 
 export function initials(name: string) {
@@ -38,14 +52,14 @@ export function initials(name: string) {
   return letters.toUpperCase();
 }
 
-// Friendly pastel pairs for avatars; each patient keeps the same color.
+// Soft baby-toned pairs for avatars; each patient keeps the same color.
 const avatarPalette = [
-  { bg: '#E3F1EC', fg: '#2F6B5F' }, // mint
-  { bg: '#FDE9DC', fg: '#B5562A' }, // peach
-  { bg: '#ECE6FA', fg: '#6146B0' }, // lavender
-  { bg: '#E0EEFB', fg: '#2D6AA8' }, // sky
-  { bg: '#FBF1D3', fg: '#9A6B00' }, // butter
-  { bg: '#FBE4EA', fg: '#B23A5E' }, // rose
+  { bg: '#E3EDFB', fg: '#5C85C4' }, // blue
+  { bg: '#FBE5EA', fg: '#C9607A' }, // pink
+  { bg: '#E2F4EE', fg: '#4C9A83' }, // mint
+  { bg: '#FBF2D9', fg: '#B08A2E' }, // butter
+  { bg: '#EEE7FA', fg: '#7D63BF' }, // lavender
+  { bg: '#FDEBDF', fg: '#C27547' }, // peach
 ];
 
 export function avatarColors(seed: string) {

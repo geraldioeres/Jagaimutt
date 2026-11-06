@@ -154,7 +154,6 @@ export default function PatientDetailScreen({ navigation, route }: Props) {
             <ActivityIndicator color={colors.accent} style={{ marginTop: space.xl }} />
           ) : (
             <View style={styles.empty}>
-              <Text style={{ fontSize: 40 }}>📝</Text>
               <Text style={type.caption}>No notes yet. Write the first one above.</Text>
             </View>
           )

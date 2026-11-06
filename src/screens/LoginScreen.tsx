@@ -41,7 +41,6 @@ export default function LoginScreen() {
         <View style={styles.form}>
           <Field
             label="Email"
-            labelColor="#fff"
             placeholder="you@clinic.com"
             autoCapitalize="none"
             keyboardType="email-address"
@@ -55,7 +54,6 @@ export default function LoginScreen() {
           <Field
             ref={passwordRef}
             label="Password"
-            labelColor="#fff"
             placeholder="••••••••"
             secureTextEntry
             autoComplete="password"
@@ -70,7 +68,6 @@ export default function LoginScreen() {
 
         <Button
           title="sign in"
-          variant="white"
           chevron
           onPress={submit}
           loading={busy}
@@ -83,11 +80,11 @@ export default function LoginScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.sky },
+  container: { flex: 1, backgroundColor: colors.background },
   inner: { flexGrow: 1, paddingHorizontal: space.xl, width: '100%', maxWidth: 440, alignSelf: 'center' },
   hero: { marginTop: 56, gap: space.md },
-  subtitle: { fontFamily: fonts.bodyBold, color: '#fff', fontSize: 14, lineHeight: 20, maxWidth: 300 },
+  subtitle: { fontFamily: fonts.bodyBold, color: colors.muted, fontSize: 14, lineHeight: 20, maxWidth: 300 },
   form: { marginTop: space.xxl, gap: space.lg },
-  input: { borderColor: 'transparent', borderRadius: 22 },
+  input: { borderRadius: 22 },
   cta: { marginTop: 40, alignSelf: 'center', minWidth: 220 },
 });

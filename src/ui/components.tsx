@@ -15,7 +15,7 @@ import { avatarColors, colors, fonts, initials, radius, shadow, space, type } fr
 
 type ButtonProps = Omit<PressableProps, 'style'> & {
   title: string;
-  variant?: 'primary' | 'white' | 'ghost' | 'ghostLight' | 'danger';
+  variant?: 'primary' | 'ghost' | 'danger';
   chevron?: boolean;
   loading?: boolean;
   style?: StyleProp<ViewStyle>;
@@ -52,20 +52,18 @@ export function Button({ title, variant = 'primary', chevron, loading, disabled,
 
 const variants = {
   primary: { bg: colors.accent, fg: '#fff', raised: true },
-  white: { bg: colors.surface, fg: colors.accent, raised: true },
   ghost: { bg: 'transparent', fg: colors.muted, raised: false },
-  ghostLight: { bg: 'transparent', fg: '#fff', raised: false },
   danger: { bg: colors.dangerSoft, fg: colors.danger, raised: false },
 };
 
-type FieldProps = TextInputProps & { label?: string; labelColor?: string };
+type FieldProps = TextInputProps & { label?: string };
 export type FieldRef = ComponentRef<typeof TextInput>;
 
-export const Field = forwardRef<FieldRef, FieldProps>(function Field({ label, labelColor, style, onFocus, onBlur, ...rest }, ref) {
+export const Field = forwardRef<FieldRef, FieldProps>(function Field({ label, style, onFocus, onBlur, ...rest }, ref) {
   const [focused, setFocused] = useState(false);
   return (
     <View style={{ gap: 6 }}>
-      {label && <Text style={[type.label, styles.fieldLabel, labelColor ? { color: labelColor } : null]}>{label}</Text>}
+      {label && <Text style={[type.label, styles.fieldLabel]}>{label}</Text>}
       <TextInput
         ref={ref}
         placeholderTextColor={colors.faint}
@@ -201,7 +199,7 @@ export function ErrorBanner({ message }: { message: string }) {
 }
 
 // Stacked lowercase wordmark with a little heart.
-export function Wordmark({ color = colors.surface, size = 26 }: { color?: string; size?: number }) {
+export function Wordmark({ color = colors.accent, size = 26 }: { color?: string; size?: number }) {
   return (
     <View style={{ alignItems: 'center' }} accessibilityRole="header" accessibilityLabel="Patient Notes">
       <Text style={[styles.wordmark, { color, fontSize: size, lineHeight: size * 0.95 }]}>
@@ -223,9 +221,9 @@ const styles = StyleSheet.create({
   buttonText: { fontFamily: fonts.heading, fontSize: 17, letterSpacing: 0.2 },
   fieldLabel: { marginLeft: space.sm },
   input: {
-    backgroundColor: colors.surface,
+    backgroundColor: colors.fill,
     borderWidth: 1.5,
-    borderColor: colors.border,
+    borderColor: 'transparent',
     borderRadius: radius.md,
     paddingHorizontal: space.lg + 2,
     paddingVertical: 14,
@@ -233,7 +231,7 @@ const styles = StyleSheet.create({
     fontFamily: fonts.body,
     color: colors.ink,
   },
-  inputFocused: { borderColor: colors.accent },
+  inputFocused: { borderColor: colors.accent, backgroundColor: colors.surface },
   avatar: { alignItems: 'center', justifyContent: 'center' },
   avatarText: { fontFamily: fonts.display, letterSpacing: 0.3 },
   pill: { flexDirection: 'row', alignItems: 'center', gap: 6, height: 36, paddingHorizontal: 16, borderRadius: radius.pill },

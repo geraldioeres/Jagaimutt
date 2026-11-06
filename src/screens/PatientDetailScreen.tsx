@@ -6,7 +6,7 @@ import { supabase } from '../lib/supabase';
 import type { Note } from '../lib/types';
 import type { RootStackParamList } from '../../App';
 import { Avatar, Button, ErrorBanner, RoundButton, TextAction } from '../ui/components';
-import { colors, fonts, radius, shadow, space, type } from '../ui/theme';
+import { cardEdge, colors, fonts, radius, shadow, space, type } from '../ui/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'PatientDetail'>;
 
@@ -193,17 +193,18 @@ const styles = StyleSheet.create({
     paddingBottom: 48,
     marginBottom: 26,
     ...shadow,
+    ...cardEdge,
   },
   profileAction: { position: 'absolute', bottom: -26, alignSelf: 'center' },
   chip: { marginTop: space.sm, backgroundColor: colors.accentSoft, borderRadius: radius.pill, paddingHorizontal: space.md, paddingVertical: 5 },
   chipText: { fontSize: 13, fontFamily: fonts.bodyBlack, color: colors.accent, letterSpacing: 0.3 },
   sectionTitle: { fontFamily: fonts.heading, fontSize: 28, color: colors.ink, opacity: 0.85, marginTop: space.sm },
-  composer: { backgroundColor: colors.surface, borderRadius: radius.lg, padding: space.lg, borderWidth: 1.5, borderColor: 'transparent', ...shadow },
+  composer: { backgroundColor: colors.surface, borderRadius: radius.lg, padding: space.lg, borderWidth: 1.5, borderColor: '#EDF1F7', ...shadow },
   composerFocused: { borderColor: colors.accent },
   input: { fontSize: 16, lineHeight: 23, fontFamily: fonts.body, color: colors.ink, minHeight: 72, textAlignVertical: 'top', padding: 0 },
   composerButtons: { flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', gap: space.lg, marginTop: space.md },
   composerButton: { height: 42, paddingHorizontal: space.xl },
-  note: { backgroundColor: colors.surface, borderRadius: radius.lg, padding: space.lg + 2, borderWidth: 1.5, borderColor: 'transparent', ...shadow },
+  note: { backgroundColor: colors.surface, borderRadius: radius.lg, padding: space.lg + 2, borderWidth: 1.5, borderColor: '#EDF1F7', ...shadow },
   noteEditing: { borderColor: colors.accent },
   date: { fontFamily: fonts.bodyBold, fontSize: 12, color: colors.faint, letterSpacing: 0.2 },
   noteActions: { flexDirection: 'row', gap: space.xl, marginTop: space.md },

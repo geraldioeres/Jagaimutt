@@ -1,10 +1,10 @@
 import { Platform } from 'react-native';
 
 export const colors = {
-  sky: '#B7CFEE', // hero / full-screen blue
-  skyDeep: '#5C85C4', // headline text on sky
-  background: '#F4F7FC',
+  background: '#FFFFFF',
   surface: '#FFFFFF',
+  fill: '#F3F6FB', // inputs and quiet chips on white
+  accentDeep: '#5C85C4', // big headlines
   ink: '#3F4A5C',
   muted: '#8D98AA',
   faint: '#C2CBD8',
@@ -31,7 +31,7 @@ export const radius = { sm: 12, md: 18, lg: 28, xl: 36, pill: 999 };
 export const space = { xs: 4, sm: 8, md: 12, lg: 16, xl: 24, xxl: 32 };
 
 export const type = {
-  hero: { fontFamily: fonts.display, fontSize: 34, lineHeight: 36, color: colors.skyDeep, textTransform: 'uppercase' as const },
+  hero: { fontFamily: fonts.display, fontSize: 34, lineHeight: 36, color: colors.accentDeep, textTransform: 'uppercase' as const },
   display: { fontFamily: fonts.display, fontSize: 28, lineHeight: 32, color: colors.ink, textTransform: 'uppercase' as const },
   title: { fontFamily: fonts.heading, fontSize: 24, lineHeight: 28, color: colors.ink },
   body: { fontFamily: fonts.body, fontSize: 16, lineHeight: 23, color: colors.ink },
@@ -39,12 +39,15 @@ export const type = {
   caption: { fontFamily: fonts.body, fontSize: 13, color: colors.muted },
 };
 
-// Soft, blue-tinted elevation for cards.
+// Soft, blue-tinted elevation so white cards still lift off a white screen.
 export const shadow = Platform.select({
-  ios: { shadowColor: '#4A6FA5', shadowOpacity: 0.12, shadowRadius: 18, shadowOffset: { width: 0, height: 8 } },
+  ios: { shadowColor: '#4A6FA5', shadowOpacity: 0.1, shadowRadius: 16, shadowOffset: { width: 0, height: 6 } },
   android: { elevation: 3, shadowColor: '#4A6FA5' },
-  default: { boxShadow: '0 8px 24px rgba(74,111,165,0.14)' },
+  default: { boxShadow: '0 6px 20px rgba(74,111,165,0.12)' },
 }) as object;
+
+// Thin outline paired with the shadow on cards.
+export const cardEdge = { borderWidth: 1, borderColor: '#EDF1F7' };
 
 export function initials(name: string) {
   const parts = name.trim().split(/\s+/).filter(Boolean);

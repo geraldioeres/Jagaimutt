@@ -73,7 +73,6 @@ export default function PatientListScreen({ navigation }: Props) {
         </View>
       </View>
 
-      <Text style={type.display}>Your patients</Text>
 
       <Tabs items={SORTS} value={sort} onChange={setSort} />
 

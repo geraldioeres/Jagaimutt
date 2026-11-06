@@ -11,6 +11,7 @@ import LoginScreen from './src/screens/LoginScreen';
 import PatientListScreen from './src/screens/PatientListScreen';
 import PatientFormScreen from './src/screens/PatientFormScreen';
 import PatientDetailScreen from './src/screens/PatientDetailScreen';
+import CalendarScreen from './src/screens/CalendarScreen';
 import type { Facility, Patient } from './src/lib/types';
 import { useFonts, Fredoka_500Medium, Fredoka_600SemiBold, Fredoka_700Bold } from '@expo-google-fonts/fredoka';
 import { Nunito_500Medium, Nunito_700Bold, Nunito_800ExtraBold } from '@expo-google-fonts/nunito';
@@ -21,6 +22,7 @@ export type RootStackParamList = {
   PatientList: undefined;
   PatientForm: { patient?: Patient; facility?: Facility } | undefined;
   PatientDetail: { patient: Patient };
+  Calendar: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -159,6 +161,7 @@ export default function App() {
             options={({ route }) => ({ title: route.params?.patient ? 'Edit patient' : 'New patient', presentation: 'modal' })}
           />
           <Stack.Screen name="PatientDetail" component={PatientDetailScreen} options={{ title: '' }} />
+          <Stack.Screen name="Calendar" component={CalendarScreen} options={{ title: 'Calendar' }} />
         </Stack.Navigator>
       </NavigationContainer>
     );

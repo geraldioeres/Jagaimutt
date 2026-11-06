@@ -11,7 +11,7 @@ import LoginScreen from './src/screens/LoginScreen';
 import PatientListScreen from './src/screens/PatientListScreen';
 import PatientFormScreen from './src/screens/PatientFormScreen';
 import PatientDetailScreen from './src/screens/PatientDetailScreen';
-import type { Patient } from './src/lib/types';
+import type { Facility, Patient } from './src/lib/types';
 import { useFonts, Fredoka_500Medium, Fredoka_600SemiBold, Fredoka_700Bold } from '@expo-google-fonts/fredoka';
 import { Nunito_500Medium, Nunito_700Bold, Nunito_800ExtraBold } from '@expo-google-fonts/nunito';
 import { Button, Wordmark } from './src/ui/components';
@@ -19,7 +19,7 @@ import { colors, fonts, space, type } from './src/ui/theme';
 
 export type RootStackParamList = {
   PatientList: undefined;
-  PatientForm: { patient?: Patient } | undefined;
+  PatientForm: { patient?: Patient; facility?: Facility } | undefined;
   PatientDetail: { patient: Patient };
 };
 

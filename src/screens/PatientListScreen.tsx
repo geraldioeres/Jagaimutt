@@ -1,21 +1,20 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, Alert, FlatList, Platform, Pressable, RefreshControl, StyleSheet, Text, View } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { supabase } from '../lib/supabase';
-import type { Patient } from '../lib/types';
+import { FACILITIES, facilityLabel, type Facility, type Patient } from '../lib/types';
 import type { RootStackParamList } from '../../App';
-import { Avatar, ErrorBanner, Field, PersonButton, RoundButton, Tabs, Wordmark } from '../ui/components';
+import { Avatar, ErrorBanner, Field, PersonButton, Pill, RoundButton, Segmented, Wordmark } from '../ui/components';
 import { cardEdge, colors, fonts, radius, shadow, space, type } from '../ui/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'PatientList'>;
 type Sort = 'recent' | 'az';
 
-const SORTS: { key: Sort; label: string }[] = [
-  { key: 'recent', label: 'Recent' },
-  { key: 'az', label: 'A–Z' },
-];
+// Remembers which place's tab was open last time.
+const FACILITY_KEY = 'patientList.facility';
 
 function confirmSignOut() {
   // Alert has no buttons on web, so use the browser's confirm there.
@@ -33,6 +32,7 @@ export default function PatientListScreen({ navigation }: Props) {
   const [patients, setPatients] = useState<Patient[]>([]);
   const [query, setQuery] = useState('');
   const [sort, setSort] = useState<Sort>('recent');
+  const [facility, setFacility] = useState<Facility>('rs_uns');
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -41,7 +41,7 @@ export default function PatientListScreen({ navigation }: Props) {
   const load = useCallback(async () => {
     const { data, error } = await supabase
       .from('patients')
-      .select('id, name, patient_number, created_at, updated_at')
+      .select('id, name, patient_number, facility, created_at, updated_at')
       .order('updated_at', { ascending: false });
     if (error) setError(`Could not load patients: ${error.message}`);
     else {
@@ -54,14 +54,34 @@ export default function PatientListScreen({ navigation }: Props) {
 
   useFocusEffect(useCallback(() => { load(); }, [load]));
 
+  useEffect(() => {
+    AsyncStorage.getItem(FACILITY_KEY)
+      .then((saved) => {
+        if (saved && FACILITIES.some((f) => f.key === saved)) setFacility(saved as Facility);
+      })
+      .catch(() => {});
+  }, []);
+
+  const changeFacility = (f: Facility) => {
+    setFacility(f);
+    AsyncStorage.setItem(FACILITY_KEY, f).catch(() => {});
+  };
+
+  const counts = useMemo(() => {
+    const c: Record<Facility, number> = { rs_uns: 0, klinik: 0 };
+    for (const p of patients) c[p.facility] = (c[p.facility] ?? 0) + 1;
+    return c;
+  }, [patients]);
+
   // Filtering happens on the device, so user input never reaches a query string.
   const visible = useMemo(() => {
     const q = query.trim().toLowerCase();
+    const here = patients.filter((p) => p.facility === facility);
     const list = q
-      ? patients.filter((p) => p.name.toLowerCase().includes(q) || p.patient_number.toLowerCase().includes(q))
-      : patients;
+      ? here.filter((p) => p.name.toLowerCase().includes(q) || p.patient_number.toLowerCase().includes(q))
+      : here;
     return sort === 'az' ? [...list].sort((a, b) => a.name.localeCompare(b.name)) : list;
-  }, [patients, query, sort]);
+  }, [patients, facility, query, sort]);
 
   const header = (
     <View style={styles.header}>
@@ -73,18 +93,31 @@ export default function PatientListScreen({ navigation }: Props) {
         </View>
       </View>
 
-
-      <Tabs items={SORTS} value={sort} onChange={setSort} />
-
-      <Field
-        placeholder="Search name or number"
-        value={query}
-        onChangeText={setQuery}
-        autoCorrect={false}
-        clearButtonMode="while-editing"
-        returnKeyType="search"
-        style={styles.search}
+      <Segmented
+        items={FACILITIES.map((f) => ({ ...f, badge: loading ? undefined : counts[f.key] }))}
+        value={facility}
+        onChange={changeFacility}
       />
+
+      <View style={styles.searchRow}>
+        <View style={{ flex: 1 }}>
+          <Field
+            placeholder="Search name or number"
+            value={query}
+            onChangeText={setQuery}
+            autoCorrect={false}
+            clearButtonMode="while-editing"
+            returnKeyType="search"
+            style={styles.search}
+          />
+        </View>
+        <Pill
+          title={sort === 'recent' ? 'Recent' : 'A–Z'}
+          icon="⇅"
+          accessibilityLabel={sort === 'recent' ? 'Sorted by recent. Sort A to Z' : 'Sorted A to Z. Sort by recent'}
+          onPress={() => setSort(sort === 'recent' ? 'az' : 'recent')}
+        />
+      </View>
       {error && <ErrorBanner message={error} />}
     </View>
   );
@@ -107,9 +140,9 @@ export default function PatientListScreen({ navigation }: Props) {
             <ActivityIndicator color={colors.accent} style={{ marginTop: space.xxl }} />
           ) : (
             <View style={styles.empty}>
-              <Text style={styles.emptyTitle}>{query ? 'No matches' : 'No patients yet'}</Text>
+              <Text style={styles.emptyTitle}>{query ? 'No matches' : `No ${facilityLabel(facility)} patients yet`}</Text>
               <Text style={[type.caption, { textAlign: 'center' }]}>
-                {query ? 'Try a different name or number.' : 'Tap the + button to add your first patient.'}
+                {query ? 'Try a different name or number.' : 'Tap the + button to add one.'}
               </Text>
             </View>
           )
@@ -134,8 +167,8 @@ export default function PatientListScreen({ navigation }: Props) {
       <RoundButton
         glyph="+"
         size={62}
-        accessibilityLabel="New patient"
-        onPress={() => navigation.navigate('PatientForm')}
+        accessibilityLabel={`New ${facilityLabel(facility)} patient`}
+        onPress={() => navigation.navigate('PatientForm', { facility })}
         style={[styles.fab, { bottom: insets.bottom + space.xl }]}
       />
     </View>
@@ -148,6 +181,7 @@ const styles = StyleSheet.create({
   header: { gap: space.lg, paddingBottom: space.lg },
   topBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: space.sm },
   topSide: { width: 44 },
+  searchRow: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
   search: { borderRadius: radius.pill },
   card: {
     flexDirection: 'row',

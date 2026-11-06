@@ -3,7 +3,7 @@ import { ActivityIndicator, Alert, FlatList, KeyboardAvoidingView, Platform, Sty
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useFocusEffect } from '@react-navigation/native';
 import { supabase } from '../lib/supabase';
-import type { Note } from '../lib/types';
+import { facilityLabel, type Note } from '../lib/types';
 import type { RootStackParamList } from '../../App';
 import { Avatar, Button, ErrorBanner, RoundButton, TextAction } from '../ui/components';
 import { cardEdge, colors, fonts, radius, shadow, space, type } from '../ui/theme';
@@ -96,7 +96,9 @@ export default function PatientDetailScreen({ navigation, route }: Props) {
         <Avatar name={patient.name} seed={patient.id} size={88} />
         <Text style={[type.title, { marginTop: space.lg, textAlign: 'center' }]}>{patient.name}</Text>
         <View style={styles.chip}>
-          <Text style={styles.chipText}>#{patient.patient_number}</Text>
+          <Text style={styles.chipText}>
+            #{patient.patient_number}  ·  {facilityLabel(patient.facility)}
+          </Text>
         </View>
         <RoundButton
           glyph="✎"

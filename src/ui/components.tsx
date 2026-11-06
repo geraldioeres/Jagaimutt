@@ -165,15 +165,36 @@ export function PersonButton({ onPress, color = colors.muted }: { onPress: () =>
   );
 }
 
-// Text tabs like "Recent  A–Z": the active one is dark, the rest pale.
-export function Tabs<T extends string>({ items, value, onChange }: { items: { key: T; label: string }[]; value: T; onChange: (key: T) => void }) {
+// Rounded two-or-more option switch, e.g. "RS UNS | Klinik".
+export function Segmented<T extends string>({
+  items,
+  value,
+  onChange,
+  role = 'tablist',
+}: {
+  items: { key: T; label: string; badge?: number }[];
+  value: T;
+  onChange: (key: T) => void;
+  role?: 'tablist' | 'radiogroup';
+}) {
   return (
-    <View style={styles.tabs} accessibilityRole="tablist">
+    <View style={styles.segTrack} accessibilityRole={role}>
       {items.map((it) => {
         const active = it.key === value;
         return (
-          <Pressable key={it.key} onPress={() => onChange(it.key)} accessibilityRole="tab" accessibilityState={{ selected: active }} hitSlop={8}>
-            <Text style={[styles.tab, active && styles.tabActive]}>{it.label}</Text>
+          <Pressable
+            key={it.key}
+            onPress={() => onChange(it.key)}
+            accessibilityRole={role === 'tablist' ? 'tab' : 'radio'}
+            accessibilityState={role === 'tablist' ? { selected: active } : { checked: active }}
+            style={[styles.seg, active && styles.segActive]}
+          >
+            <Text style={[styles.segText, active && styles.segTextActive]}>{it.label}</Text>
+            {it.badge !== undefined && (
+              <View style={[styles.segBadge, active && styles.segBadgeActive]}>
+                <Text style={[styles.segBadgeText, active && styles.segBadgeTextActive]}>{it.badge}</Text>
+              </View>
+            )}
           </Pressable>
         );
       })}
@@ -244,9 +265,15 @@ const styles = StyleSheet.create({
   iconButton: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center', gap: 2 },
   personHead: { width: 12, height: 12, borderRadius: 6, borderWidth: 1.8 },
   personBody: { width: 22, height: 10, borderTopLeftRadius: 11, borderTopRightRadius: 11, borderWidth: 1.8, borderBottomWidth: 0 },
-  tabs: { flexDirection: 'row', gap: space.xl, alignItems: 'baseline' },
-  tab: { fontFamily: fonts.headingSoft, fontSize: 18, color: colors.faint },
-  tabActive: { fontFamily: fonts.heading, color: colors.ink },
+  segTrack: { flexDirection: 'row', backgroundColor: colors.fill, borderRadius: radius.pill, padding: 4 },
+  seg: { flex: 1, flexDirection: 'row', gap: 6, height: 42, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center' },
+  segActive: { backgroundColor: colors.surface, ...shadow },
+  segText: { fontFamily: fonts.headingSoft, fontSize: 16, color: colors.muted },
+  segTextActive: { fontFamily: fonts.heading, color: colors.accent },
+  segBadge: { minWidth: 22, height: 20, paddingHorizontal: 6, borderRadius: 10, backgroundColor: colors.border, alignItems: 'center', justifyContent: 'center' },
+  segBadgeActive: { backgroundColor: colors.accentSoft },
+  segBadgeText: { fontFamily: fonts.bodyBlack, fontSize: 11, color: colors.muted },
+  segBadgeTextActive: { color: colors.accent },
   textAction: { fontSize: 15, fontFamily: fonts.bodyBold },
   banner: { backgroundColor: colors.dangerSoft, borderRadius: radius.sm, paddingVertical: 10, paddingHorizontal: space.md },
   bannerText: { color: colors.danger, fontSize: 14, lineHeight: 20, fontFamily: fonts.bodyBold },

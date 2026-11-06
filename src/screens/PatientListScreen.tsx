@@ -7,7 +7,7 @@ import { supabase } from '../lib/supabase';
 import type { Patient } from '../lib/types';
 import type { RootStackParamList } from '../../App';
 import { Avatar, ErrorBanner, Field, PersonButton, RoundButton, Tabs, Wordmark } from '../ui/components';
-import { colors, fonts, radius, shadow, space, type } from '../ui/theme';
+import { cardEdge, colors, fonts, radius, shadow, space, type } from '../ui/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'PatientList'>;
 type Sort = 'recent' | 'az';
@@ -161,7 +161,7 @@ const styles = StyleSheet.create({
   topBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: space.sm },
   topSide: { width: 44 },
   greeting: { fontFamily: fonts.bodyBold, fontSize: 14, color: colors.muted },
-  search: { borderRadius: radius.pill, borderColor: 'transparent', ...shadow },
+  search: { borderRadius: radius.pill },
   card: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -170,6 +170,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
     borderRadius: radius.lg,
     ...shadow,
+    ...cardEdge,
   },
   cardPressed: { transform: [{ scale: 0.98 }] },
   name: { fontFamily: fonts.heading, fontSize: 18, color: colors.ink, marginBottom: 2 },

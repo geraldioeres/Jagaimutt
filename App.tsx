@@ -117,7 +117,7 @@ export default function App() {
   if (!ready || (!fontsLoaded && !fontError)) {
     content = (
       <View style={styles.center}>
-        <ActivityIndicator color="#fff" />
+        <ActivityIndicator color={colors.accent} />
       </View>
     );
   } else if (!session) {
@@ -134,8 +134,8 @@ export default function App() {
         <Text style={styles.lockSub}>Unlock to see your patients and notes.</Text>
         {lockError && <Text style={styles.error}>{lockError}</Text>}
         <View style={styles.lockActions}>
-          <Button title="unlock" variant="white" chevron onPress={unlock} />
-          <Button title="sign out" variant="ghostLight" onPress={() => supabase.auth.signOut()} />
+          <Button title="unlock" chevron onPress={unlock} />
+          <Button title="sign out" variant="ghost" onPress={() => supabase.auth.signOut()} />
         </View>
       </View>
     );
@@ -166,19 +166,19 @@ export default function App() {
 
   return (
     <SafeAreaProvider>
-      <StatusBar style={session && !locked ? 'dark' : 'light'} />
+      <StatusBar style="dark" />
       {content}
     </SafeAreaProvider>
   );
 }
 
 const styles = StyleSheet.create({
-  center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: space.xl, backgroundColor: colors.sky },
+  center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: space.xl, backgroundColor: colors.background },
   lock: {
     width: 84,
     height: 84,
     borderRadius: 42,
-    backgroundColor: colors.surface,
+    backgroundColor: colors.accentSoft,
     alignItems: 'center',
     justifyContent: 'center',
     paddingTop: 6,
@@ -187,7 +187,7 @@ const styles = StyleSheet.create({
   },
   lockShackle: { width: 20, height: 16, borderWidth: 3.5, borderBottomWidth: 0, borderColor: colors.accent, borderTopLeftRadius: 10, borderTopRightRadius: 10 },
   lockBody: { width: 32, height: 23, borderRadius: 7, backgroundColor: colors.accent },
-  lockSub: { fontFamily: fonts.bodyBold, color: '#fff', fontSize: 15, marginTop: space.md, textAlign: 'center' },
-  error: { color: '#fff', backgroundColor: 'rgba(224,112,127,0.85)', borderRadius: 12, overflow: 'hidden', padding: 10, textAlign: 'center', marginTop: space.lg, lineHeight: 20, fontFamily: fonts.bodyBold },
+  lockSub: { fontFamily: fonts.bodyBold, color: colors.muted, fontSize: 15, marginTop: space.md, textAlign: 'center' },
+  error: { color: colors.danger, backgroundColor: colors.dangerSoft, borderRadius: 12, overflow: 'hidden', padding: 10, textAlign: 'center', marginTop: space.lg, lineHeight: 20, fontFamily: fonts.bodyBold },
   lockActions: { maxWidth: 320, width: '100%', marginTop: 48, gap: space.sm, alignItems: 'stretch', alignSelf: 'center' },
 });

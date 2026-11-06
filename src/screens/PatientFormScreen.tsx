@@ -1,10 +1,11 @@
 import { useRef, useState } from 'react';
-import { KeyboardAvoidingView, Platform, StyleSheet, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, StyleSheet, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { supabase } from '../lib/supabase';
 import type { RootStackParamList } from '../../App';
-import { Button, ErrorBanner, Field, type FieldRef } from '../ui/components';
-import { colors, space } from '../ui/theme';
+import { FACILITIES, facilityLabel, type Facility } from '../lib/types';
+import { Button, ErrorBanner, Field, Segmented, type FieldRef } from '../ui/components';
+import { colors, space, type } from '../ui/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'PatientForm'>;
 
@@ -12,6 +13,7 @@ export default function PatientFormScreen({ navigation, route }: Props) {
   const existing = route.params?.patient;
   const [name, setName] = useState(existing?.name ?? '');
   const [number, setNumber] = useState(existing?.patient_number ?? '');
+  const [facility, setFacility] = useState<Facility>(existing?.facility ?? route.params?.facility ?? 'rs_uns');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const numberRef = useRef<FieldRef>(null);
@@ -21,13 +23,15 @@ export default function PatientFormScreen({ navigation, route }: Props) {
     if (!valid) return;
     setBusy(true);
     setError(null);
-    const fields = { name: name.trim(), patient_number: number.trim() };
+    const fields = { name: name.trim(), patient_number: number.trim(), facility };
     const { error } = existing
       ? await supabase.from('patients').update(fields).eq('id', existing.id)
       : await supabase.from('patients').insert(fields);
     setBusy(false);
     if (error) {
-      setError(error.code === '23505' ? 'A patient with this number already exists.' : error.message);
+      setError(
+        error.code === '23505' ? `A ${facilityLabel(facility)} patient with this number already exists.` : error.message,
+      );
       return;
     }
     navigation.popToTop();
@@ -36,6 +40,10 @@ export default function PatientFormScreen({ navigation, route }: Props) {
   return (
     <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <View style={styles.inner}>
+        <View style={{ gap: 6 }}>
+          <Text style={[type.label, styles.label]}>Place</Text>
+          <Segmented items={FACILITIES} value={facility} onChange={setFacility} role="radiogroup" />
+        </View>
         <Field
           label="Full name"
           placeholder="Jane Doe"
@@ -65,4 +73,5 @@ export default function PatientFormScreen({ navigation, route }: Props) {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
   inner: { padding: space.xl, gap: space.lg, width: '100%', maxWidth: 520, alignSelf: 'center' },
+  label: { marginLeft: space.sm },
 });

@@ -198,15 +198,17 @@ export function ErrorBanner({ message }: { message: string }) {
   );
 }
 
-// Stacked lowercase wordmark with a little heart.
+// Lowercase one-line wordmark.
 export function Wordmark({ color = colors.accent, size = 26 }: { color?: string; size?: number }) {
   return (
-    <View style={{ alignItems: 'center' }} accessibilityRole="header" accessibilityLabel="Patient Notes">
-      <Text style={[styles.wordmark, { color, fontSize: size, lineHeight: size * 0.95 }]}>
-        patient<Text style={{ fontSize: size * 0.6 }}> ♥</Text>
-      </Text>
-      <Text style={[styles.wordmark, { color, fontSize: size, lineHeight: size * 0.95 }]}>notes</Text>
-    </View>
+    <Text
+      accessibilityRole="header"
+      accessibilityLabel="Patient Notes"
+      numberOfLines={1}
+      style={[styles.wordmark, { color, fontSize: size, lineHeight: size * 1.15 }]}
+    >
+      patient notes
+    </Text>
   );
 }
 

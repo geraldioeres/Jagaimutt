@@ -17,13 +17,6 @@ const SORTS: { key: Sort; label: string }[] = [
   { key: 'az', label: 'A–Z' },
 ];
 
-function greeting() {
-  const h = new Date().getHours();
-  if (h < 12) return 'Good morning';
-  if (h < 18) return 'Good afternoon';
-  return 'Good evening';
-}
-
 function confirmSignOut() {
   // Alert has no buttons on web, so use the browser's confirm there.
   if (Platform.OS === 'web') {
@@ -80,10 +73,7 @@ export default function PatientListScreen({ navigation }: Props) {
         </View>
       </View>
 
-      <View style={{ gap: space.xs }}>
-        <Text style={styles.greeting}>{greeting()} 👋</Text>
-        <Text style={type.display}>Your patients</Text>
-      </View>
+      <Text style={type.display}>Your patients</Text>
 
       <Tabs items={SORTS} value={sort} onChange={setSort} />
 
@@ -118,7 +108,6 @@ export default function PatientListScreen({ navigation }: Props) {
             <ActivityIndicator color={colors.accent} style={{ marginTop: space.xxl }} />
           ) : (
             <View style={styles.empty}>
-              <Text style={styles.emptyEmoji}>{query ? '🔎' : '🍼'}</Text>
               <Text style={styles.emptyTitle}>{query ? 'No matches' : 'No patients yet'}</Text>
               <Text style={[type.caption, { textAlign: 'center' }]}>
                 {query ? 'Try a different name or number.' : 'Tap the + button to add your first patient.'}
@@ -160,7 +149,6 @@ const styles = StyleSheet.create({
   header: { gap: space.lg, paddingBottom: space.lg },
   topBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: space.sm },
   topSide: { width: 44 },
-  greeting: { fontFamily: fonts.bodyBold, fontSize: 14, color: colors.muted },
   search: { borderRadius: radius.pill },
   card: {
     flexDirection: 'row',
@@ -178,7 +166,6 @@ const styles = StyleSheet.create({
   go: { width: 34, height: 34, borderRadius: 17, backgroundColor: colors.accentSoft, alignItems: 'center', justifyContent: 'center' },
   goText: { fontFamily: fonts.heading, fontSize: 22, lineHeight: 24, color: colors.accent, marginLeft: 2 },
   empty: { alignItems: 'center', marginTop: 56, gap: space.xs },
-  emptyEmoji: { fontSize: 48, marginBottom: space.sm },
   emptyTitle: { fontFamily: fonts.heading, fontSize: 20, color: colors.ink },
   fab: { position: 'absolute', right: space.xl },
 });

@@ -7,7 +7,7 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { supabase } from '../lib/supabase';
 import { FACILITIES, facilityLabel, type Facility, type Patient } from '../lib/types';
 import type { RootStackParamList } from '../../App';
-import { Avatar, ErrorBanner, Field, PersonButton, Pill, RoundButton, Segmented, Wordmark } from '../ui/components';
+import { Avatar, CalendarButton, ErrorBanner, Field, PersonButton, Pill, RoundButton, Segmented, Wordmark } from '../ui/components';
 import { cardEdge, colors, fonts, radius, shadow, space, type } from '../ui/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'PatientList'>;
@@ -86,7 +86,9 @@ export default function PatientListScreen({ navigation }: Props) {
   const header = (
     <View style={styles.header}>
       <View style={styles.topBar}>
-        <View style={styles.topSide} />
+        <View style={styles.topSide}>
+          <CalendarButton onPress={() => navigation.navigate('Calendar')} />
+        </View>
         <Wordmark color={colors.accent} size={22} />
         <View style={[styles.topSide, { alignItems: 'flex-end' }]}>
           <PersonButton onPress={confirmSignOut} />

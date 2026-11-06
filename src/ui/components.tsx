@@ -165,6 +165,28 @@ export function PersonButton({ onPress, color = colors.muted }: { onPress: () =>
   );
 }
 
+// Outline calendar icon drawn with views.
+export function CalendarButton({ onPress, color = colors.muted }: { onPress: () => void; color?: string }) {
+  return (
+    <Pressable
+      onPress={onPress}
+      hitSlop={10}
+      accessibilityRole="button"
+      accessibilityLabel="Calendar"
+      style={({ pressed }) => [styles.iconButton, pressed && { opacity: 0.5 }]}
+    >
+      <View style={[styles.calBody, { borderColor: color }]}>
+        <View style={[styles.calBar, { backgroundColor: color }]} />
+        <View style={styles.calDots}>
+          {[0, 1, 2, 3].map((i) => (
+            <View key={i} style={[styles.calDot, { backgroundColor: color }]} />
+          ))}
+        </View>
+      </View>
+    </Pressable>
+  );
+}
+
 // Rounded two-or-more option switch, e.g. "RS UNS | Klinik".
 export function Segmented<T extends string>({
   items,
@@ -265,6 +287,10 @@ const styles = StyleSheet.create({
   iconButton: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center', gap: 2 },
   personHead: { width: 12, height: 12, borderRadius: 6, borderWidth: 1.8 },
   personBody: { width: 22, height: 10, borderTopLeftRadius: 11, borderTopRightRadius: 11, borderWidth: 1.8, borderBottomWidth: 0 },
+  calBody: { width: 22, height: 21, borderRadius: 5, borderWidth: 1.8, overflow: 'hidden' },
+  calBar: { height: 4 },
+  calDots: { flexDirection: 'row', flexWrap: 'wrap', gap: 3, padding: 3, paddingTop: 3 },
+  calDot: { width: 3, height: 3, borderRadius: 1.5 },
   segTrack: { flexDirection: 'row', backgroundColor: colors.fill, borderRadius: radius.pill, padding: 4 },
   seg: { flex: 1, flexDirection: 'row', gap: 6, height: 42, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center' },
   segActive: { backgroundColor: colors.surface, ...shadow },

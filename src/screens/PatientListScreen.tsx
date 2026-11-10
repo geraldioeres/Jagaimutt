@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, Alert, AppState, FlatList, Platform, Pressable, RefreshControl, StyleSheet, Text, View } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
+import { Sloth } from '../ui/Sloth';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -162,6 +163,7 @@ export default function PatientListScreen({ navigation }: Props) {
             <ActivityIndicator color={colors.accent} style={{ marginTop: space.xxl }} />
           ) : (
             <View style={styles.empty}>
+              <Sloth kind="clipboard" size={120} />
               <Text style={styles.emptyTitle}>{query ? 'No matches' : `No ${facilityLabel(facility)} patients yet`}</Text>
               <Text style={[type.caption, { textAlign: 'center' }]}>
                 {query ? 'Try a different name or number.' : 'Tap the + button to add one.'}

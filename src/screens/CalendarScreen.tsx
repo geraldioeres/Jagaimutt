@@ -7,6 +7,7 @@ import { FACILITIES, facilityLabel, type Facility, type Patient } from '../lib/t
 import { addMonths, dayKey, longDay, monthGrid, monthTitle, startOfMonth, timeOf, WEEKDAYS } from '../lib/dates';
 import type { RootStackParamList } from '../../App';
 import { Avatar, ErrorBanner, Segmented } from '../ui/components';
+import { Sloth } from '../ui/Sloth';
 import { cardEdge, colors, fonts, radius, shadow, space, type } from '../ui/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Calendar'>;
@@ -130,7 +131,10 @@ export default function CalendarScreen({ navigation }: Props) {
       {loading ? (
         <ActivityIndicator color={colors.accent} style={{ marginTop: space.lg }} />
       ) : dayNotes.length === 0 ? (
-        <Text style={[type.caption, styles.empty]}>No notes on this day.</Text>
+        <View style={styles.empty}>
+          <Sloth kind="clipboard" size={96} />
+          <Text style={type.caption}>No notes on this day.</Text>
+        </View>
       ) : (
         <View style={{ gap: space.md }}>
           {dayNotes.map((n) => (
@@ -192,7 +196,7 @@ const styles = StyleSheet.create({
   dotOnSelected: { backgroundColor: '#fff' },
   dayHeader: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between', marginTop: space.sm },
   dayTitle: { fontFamily: fonts.heading, fontSize: 20, color: colors.ink },
-  empty: { textAlign: 'center', marginTop: space.lg },
+  empty: { alignItems: 'center', gap: space.sm, marginTop: space.md },
   note: { backgroundColor: colors.surface, borderRadius: radius.lg, padding: space.lg, ...shadow, ...cardEdge },
   noteHead: { flexDirection: 'row', alignItems: 'center', gap: space.md },
   noteName: { fontFamily: fonts.heading, fontSize: 16, color: colors.ink },

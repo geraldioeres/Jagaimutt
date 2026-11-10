@@ -1,5 +1,5 @@
-import { useEffect, useState, type ReactNode } from 'react';
-import { AccessibilityInfo, Animated, Easing, Platform } from 'react-native';
+import type { ReactNode } from 'react';
+import { View } from 'react-native';
 import Svg, { Circle, Ellipse, G, Path, Rect } from 'react-native-svg';
 import { colors } from './theme';
 
@@ -26,51 +26,14 @@ const LABELS: Record<SlothKind, string> = {
 };
 
 export function Sloth({ kind, size = 120 }: { kind: SlothKind; size?: number }) {
-  const [t] = useState(() => new Animated.Value(0));
-
-  // A slow back-and-forth loop; skipped when the phone asks for reduced motion.
-  useEffect(() => {
-    let loop: Animated.CompositeAnimation | undefined;
-    let cancelled = false;
-    AccessibilityInfo.isReduceMotionEnabled()
-      .catch(() => false)
-      .then((reduce) => {
-        if (reduce || cancelled) return;
-        const ease = Easing.inOut(Easing.sin);
-        const native = Platform.OS !== 'web';
-        loop = Animated.loop(
-          Animated.sequence([
-            Animated.timing(t, { toValue: 1, duration: 1100, easing: ease, useNativeDriver: native }),
-            Animated.timing(t, { toValue: 0, duration: 1100, easing: ease, useNativeDriver: native }),
-          ]),
-        );
-        loop.start();
-      });
-    return () => {
-      cancelled = true;
-      loop?.stop();
-    };
-  }, [t]);
-
-  const motion = {
-    love: [{ translateY: t.interpolate({ inputRange: [0, 1], outputRange: [0, -4] }) }, { scale: t.interpolate({ inputRange: [0, 1], outputRange: [1, 1.03] }) }],
-    lock: [{ rotate: t.interpolate({ inputRange: [0, 1], outputRange: ['-3deg', '3deg'] }) }],
-    clipboard: [{ translateY: t.interpolate({ inputRange: [0, 0.5, 1], outputRange: [0, -6, 0] }) }, { rotate: t.interpolate({ inputRange: [0, 1], outputRange: ['-2deg', '2deg'] }) }],
-  }[kind];
-
   return (
-    <Animated.View
-      accessible
-      accessibilityRole="image"
-      accessibilityLabel={LABELS[kind]}
-      style={{ width: size, height: size, transform: motion }}
-    >
+    <View accessible accessibilityRole="image" accessibilityLabel={LABELS[kind]} style={{ width: size, height: size }}>
       <Svg width={size} height={size} viewBox="0 0 120 120">
         {kind === 'love' && <Love />}
         {kind === 'lock' && <Lock />}
         {kind === 'clipboard' && <Clipboard />}
       </Svg>
-    </Animated.View>
+    </View>
   );
 }
 

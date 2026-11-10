@@ -2,12 +2,14 @@ import { useRef, useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { supabase } from '../lib/supabase';
+import { loginEmail } from '../lib/username';
 import { Button, ErrorBanner, Field, Wordmark, type FieldRef } from '../ui/components';
 import { colors, space, type } from '../ui/theme';
 
-// Sign-up is intentionally absent: create her account in the Supabase dashboard.
+// Sign-up is intentionally absent: create her account in the Supabase dashboard
+// (see src/lib/username.ts for how a username maps to the account's email).
 export default function LoginScreen() {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -15,11 +17,11 @@ export default function LoginScreen() {
   const insets = useSafeAreaInsets();
 
   const submit = async () => {
-    if (!email || !password) return;
+    if (!username.trim() || !password) return;
     setBusy(true);
     setError(null);
-    const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
-    if (error) setError(error.message);
+    const { error } = await supabase.auth.signInWithPassword({ email: loginEmail(username), password });
+    if (error) setError(error.code === 'invalid_credentials' ? 'Wrong username or password.' : error.message);
     setBusy(false);
   };
 
@@ -37,14 +39,15 @@ export default function LoginScreen() {
 
         <View style={styles.form}>
           <Field
-            label="Email"
-            placeholder="you@clinic.com"
+            label="Username"
+            placeholder="username"
             autoCapitalize="none"
-            keyboardType="email-address"
-            autoComplete="email"
+            autoCorrect={false}
+            autoComplete="username"
+            textContentType="username"
             returnKeyType="next"
-            value={email}
-            onChangeText={setEmail}
+            value={username}
+            onChangeText={setUsername}
             onSubmitEditing={() => passwordRef.current?.focus()}
             style={styles.input}
           />
@@ -68,7 +71,7 @@ export default function LoginScreen() {
           chevron
           onPress={submit}
           loading={busy}
-          disabled={!email || !password}
+          disabled={!username.trim() || !password}
           style={styles.cta}
         />
       </ScrollView>

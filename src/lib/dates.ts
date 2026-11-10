@@ -39,6 +39,14 @@ export function longDay(d: Date) {
   return d.toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' });
 }
 
+export function weekdayName(d: Date) {
+  return d.toLocaleDateString(undefined, { weekday: 'long' });
+}
+
+export function fullDate(d: Date) {
+  return d.toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' });
+}
+
 export function timeOf(iso: string) {
   return new Date(iso).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
 }

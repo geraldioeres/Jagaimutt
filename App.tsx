@@ -16,6 +16,7 @@ import type { Facility, Patient } from './src/lib/types';
 import { useFonts, Fredoka_500Medium, Fredoka_600SemiBold, Fredoka_700Bold } from '@expo-google-fonts/fredoka';
 import { Nunito_500Medium, Nunito_700Bold, Nunito_800ExtraBold } from '@expo-google-fonts/nunito';
 import { Button, Wordmark } from './src/ui/components';
+import { Sloth } from './src/ui/Sloth';
 import { colors, fonts, space, type } from './src/ui/theme';
 
 export type RootStackParamList = {
@@ -129,8 +130,7 @@ export default function App() {
       <View style={styles.center}>
         <Wordmark />
         <View style={styles.lock}>
-          <View style={styles.lockShackle} />
-          <View style={styles.lockBody} />
+          <Sloth kind="lock" size={150} />
         </View>
         <Text style={[type.hero, { textAlign: 'center' }]}>Locked{'\n'}for privacy</Text>
         <Text style={styles.lockSub}>Unlock to see your patients and notes.</Text>
@@ -177,19 +177,7 @@ export default function App() {
 
 const styles = StyleSheet.create({
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: space.xl, backgroundColor: colors.background },
-  lock: {
-    width: 84,
-    height: 84,
-    borderRadius: 42,
-    backgroundColor: colors.accentSoft,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingTop: 6,
-    marginTop: 48,
-    marginBottom: space.xl,
-  },
-  lockShackle: { width: 20, height: 16, borderWidth: 3.5, borderBottomWidth: 0, borderColor: colors.accent, borderTopLeftRadius: 10, borderTopRightRadius: 10 },
-  lockBody: { width: 32, height: 23, borderRadius: 7, backgroundColor: colors.accent },
+  lock: { marginTop: 40, marginBottom: space.lg },
   lockSub: { fontFamily: fonts.bodyBold, color: colors.muted, fontSize: 15, marginTop: space.md, textAlign: 'center' },
   error: { color: colors.danger, backgroundColor: colors.dangerSoft, borderRadius: 12, overflow: 'hidden', padding: 10, textAlign: 'center', marginTop: space.lg, lineHeight: 20, fontFamily: fonts.bodyBold },
   lockActions: { maxWidth: 320, width: '100%', marginTop: 48, gap: space.sm, alignItems: 'stretch', alignSelf: 'center' },

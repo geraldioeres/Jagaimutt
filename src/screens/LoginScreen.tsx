@@ -4,6 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { supabase } from '../lib/supabase';
 import { loginEmail } from '../lib/username';
 import { Button, ErrorBanner, Field, Wordmark, type FieldRef } from '../ui/components';
+import { Sloth } from '../ui/Sloth';
 import { colors, space, type } from '../ui/theme';
 
 // Sign-up is intentionally absent: create her account in the Supabase dashboard
@@ -34,6 +35,7 @@ export default function LoginScreen() {
         <Wordmark />
 
         <View style={styles.hero}>
+          <Sloth kind="love" size={132} />
           <Text style={styles.headline}>Haiii lov, semangat jaganya! 🥨</Text>
         </View>
 

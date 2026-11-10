@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, Alert, FlatList, Platform, Pressable, RefreshControl, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, AppState, FlatList, Platform, Pressable, RefreshControl, StyleSheet, Text, View } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { supabase } from '../lib/supabase';
+import { fullDate, weekdayName } from '../lib/dates';
 import { FACILITIES, facilityLabel, type Facility, type Patient } from '../lib/types';
 import type { RootStackParamList } from '../../App';
 import { Avatar, CalendarButton, ErrorBanner, Field, PersonButton, Pill, RoundButton, Segmented, Wordmark } from '../ui/components';
@@ -52,7 +53,16 @@ export default function PatientListScreen({ navigation }: Props) {
     setRefreshing(false);
   }, []);
 
-  useFocusEffect(useCallback(() => { load(); }, [load]));
+  // Today's date for the header. Refreshed when the screen regains focus or the
+  // app comes back to the foreground, so it rolls over after midnight.
+  const [now, setNow] = useState(() => new Date());
+  useFocusEffect(useCallback(() => { load(); setNow(new Date()); }, [load]));
+  useEffect(() => {
+    const sub = AppState.addEventListener('change', (s) => {
+      if (s === 'active') setNow(new Date());
+    });
+    return () => sub.remove();
+  }, []);
 
   useEffect(() => {
     AsyncStorage.getItem(FACILITY_KEY)
@@ -94,6 +104,16 @@ export default function PatientListScreen({ navigation }: Props) {
           <PersonButton onPress={confirmSignOut} />
         </View>
       </View>
+
+      <Pressable
+        onPress={() => navigation.navigate('Calendar')}
+        accessibilityRole="button"
+        accessibilityLabel={`Today is ${weekdayName(now)}, ${fullDate(now)}. Open calendar`}
+        style={({ pressed }) => [styles.today, pressed && { opacity: 0.6 }]}
+      >
+        <Text style={styles.todayWeekday}>{weekdayName(now)}</Text>
+        <Text style={styles.todayDate}>{fullDate(now)}</Text>
+      </Pressable>
 
       <Segmented
         items={FACILITIES.map((f) => ({ ...f, badge: loading ? undefined : counts[f.key] }))}
@@ -182,6 +202,9 @@ const styles = StyleSheet.create({
   content: { paddingHorizontal: space.xl, width: '100%', maxWidth: 640, alignSelf: 'center' },
   header: { gap: space.lg, paddingBottom: space.lg },
   topBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: space.sm },
+  today: { alignSelf: 'flex-start' },
+  todayWeekday: { fontFamily: fonts.bodyBold, fontSize: 14, color: colors.muted },
+  todayDate: { fontFamily: fonts.display, fontSize: 28, lineHeight: 34, color: colors.ink },
   topSide: { width: 44 },
   searchRow: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
   search: { borderRadius: radius.pill },
